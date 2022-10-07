@@ -6,3 +6,5 @@
 
 ### Continuous integration:
 [![node CI](https://github.com/heavylad/frontend-project-11/actions/workflows/nodejs.yml/badge.svg)](https://github.com/heavylad/frontend-project-11/actions/workflows/nodejs.yml)
+
+[RSS](https://frontend-project-11-zeta.vercel.app)
