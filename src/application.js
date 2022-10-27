@@ -21,10 +21,8 @@ const getContents = (url) => {
   link.searchParams.set('disableCache', 'true');
   link.searchParams.set('url', url);
   return axios.get(link)
-    .then((response) => response.data.contents)
-    .catch(() => new Error('networkError'));
-  // .catch(() => Promise.reject(new Error('networkError')))
-  // .then((response) => Promise.resolve(response.data.contents));
+    .catch(() => Promise.reject(new Error('networkError')))
+    .then((response) => Promise.resolve(response.data.contents));
 };
 
 let counter = 0;
@@ -74,28 +72,45 @@ export default () => {
 
   const watchedState = onChange(state, render(elements, i18nextInstance));
 
+  const autoUpdatePosts = (id, delay = 5000) => {
+    const inner = () => {
+      watchedState.feeds.forEach(({ link }) => {
+        getContents(link)
+          .then(parser)
+          .then(({ posts }) => {
+            const postsTitles = watchedState.posts.map((post) => post.title);
+            const newPosts = posts.filter(({ title }) => !postsTitles.includes(title));
+            newPosts.forEach((newPost) => watchedState.posts.unshift({ ...newPost, id }));
+          })
+          .catch(console.log)
+          .finally(setTimeout(inner, delay));
+      });
+    };
+    setTimeout(inner, delay);
+  };
+
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const url = formData.get('url').trim();
     watchedState.process = 'sending';
     validate(url, watchedState.links)
-      .then((validUrl) => {
-        watchedState.links.push(validUrl);
-        return getContents(validUrl);
-      })
-      .then((content) => parser(content))
+      .then(getContents)
+      .then(parser)
       .then((parsedContents) => {
         const { feed, posts } = parsedContents;
+        watchedState.links.push(url);
         watchedState.process = 'success';
         const id = getId();
-        watchedState.feeds.push({ ...feed, id });
-        posts.forEach((post) => watchedState.posts.push({ ...post, id }));
-        console.log(watchedState.posts);
+        watchedState.feeds.push({ ...feed, id, link: url });
+        const postsWithId = posts.map((post) => ({ ...post, id }));
+        watchedState.posts = postsWithId.concat(watchedState.posts);
+        autoUpdatePosts(id);
+        console.log(watchedState);
       })
       .catch((err) => {
         watchedState.process = 'failed';
-        watchedState.errors = err.message;
+        watchedState.errors = err.message ?? 'default';
         console.log(watchedState);
       })
       .finally(() => {

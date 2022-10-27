@@ -80,7 +80,7 @@ const renderPosts = (elements, value, i18nextInstance) => {
   value.forEach(({ title, link, id }) => {
     const listGroupItem = document.createElement('li');
     listGroupItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
-    listGroup.prepend(listGroupItem);
+    listGroup.append(listGroupItem);
     const linkEl = document.createElement('a');
     linkEl.setAttribute('href', link);
     linkEl.setAttribute('target', '_blank');
