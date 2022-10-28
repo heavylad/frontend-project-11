@@ -69,7 +69,7 @@ const renderFeeds = (elements, value, i18nextInstance) => {
   });
 };
 
-const renderPosts = (elements, value, i18nextInstance) => {
+const renderPosts = (elements, value, i18nextInstance, state) => {
   const { posts } = elements;
   posts.innerHTML = '';
   const card = makeContainer();
@@ -77,7 +77,7 @@ const renderPosts = (elements, value, i18nextInstance) => {
   const cardTitle = card.querySelector('h2');
   cardTitle.textContent = i18nextInstance.t('posts');
   const listGroup = card.querySelector('ul');
-  value.forEach(({ title, link, id }) => {
+  value.forEach(({ title, link, feedId }) => {
     const listGroupItem = document.createElement('li');
     listGroupItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
     listGroup.append(listGroupItem);
@@ -85,10 +85,18 @@ const renderPosts = (elements, value, i18nextInstance) => {
     linkEl.setAttribute('href', link);
     linkEl.setAttribute('target', '_blank');
     linkEl.setAttribute('rel', 'noopener noreferrer');
-    linkEl.setAttribute('data-id', id);
-    linkEl.classList.add('fw-bold');
+    linkEl.setAttribute('data-id', feedId);
+    const fontWeightClass = state.readPostsLinks.includes(link) ? 'fw-normal' : 'fw-bold';
+    linkEl.classList.add(fontWeightClass);
     linkEl.textContent = title;
-    listGroupItem.append(linkEl);
+    const buttonEl = document.createElement('button');
+    buttonEl.setAttribute('type', 'button');
+    buttonEl.setAttribute('data-id', '2');
+    buttonEl.setAttribute('data-bs-toggle', 'modal');
+    buttonEl.setAttribute('data-bs-target', '#modal');
+    buttonEl.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+    buttonEl.textContent = i18nextInstance.t('preview');
+    listGroupItem.append(linkEl, buttonEl);
   });
 };
 
@@ -100,7 +108,14 @@ const renderReadPosts = (elements, value) => {
   });
 };
 
-export default (elements, i18nextInstance) => (path, value) => {
+const renderModalWindow = (elements, value) => {
+  const { title, body, button } = elements.modal;
+  title.textContent = value.title;
+  body.textContent = value.description;
+  button.href = value.link;
+};
+
+export default (elements, i18nextInstance, state) => (path, value) => {
   switch (path) {
     case 'errors':
       renderErrors(elements, value, i18nextInstance);
@@ -115,11 +130,15 @@ export default (elements, i18nextInstance) => (path, value) => {
       break;
 
     case 'posts':
-      renderPosts(elements, value, i18nextInstance);
+      renderPosts(elements, value, i18nextInstance, state);
       break;
 
-    case 'readPosts':
+    case 'readPostsLinks':
       renderReadPosts(elements, value);
+      break;
+
+    case 'modal':
+      renderModalWindow(elements, value);
       break;
 
     default:

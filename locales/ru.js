@@ -5,6 +5,7 @@ export default {
     preview: 'Просмотр',
     success: 'RSS успешно загружен',
     errors: {
+      empty: 'Не должно быть пустым',
       invalidUrl: 'Ссылка должна быть валидным URL',
       noRSS: 'Ресурс не содержит валидный RSS',
       alreadyExists: 'RSS уже существует',
