@@ -69,6 +69,12 @@ const renderFeeds = (elements, value, i18nextInstance) => {
   });
 };
 
+const setAttributes = (el, options) => {
+  Object.keys(options).forEach((attr) => {
+    el.setAttribute(attr, options[attr]);
+  });
+};
+
 const renderPosts = (elements, value, i18nextInstance, state) => {
   const { posts } = elements;
   posts.innerHTML = '';
@@ -82,18 +88,16 @@ const renderPosts = (elements, value, i18nextInstance, state) => {
     listGroupItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
     listGroup.append(listGroupItem);
     const linkEl = document.createElement('a');
-    linkEl.setAttribute('href', link);
-    linkEl.setAttribute('target', '_blank');
-    linkEl.setAttribute('rel', 'noopener noreferrer');
-    linkEl.setAttribute('data-id', feedId);
+    setAttributes(linkEl, {
+      href: link, target: '_blank', rel: 'noopener noreferrer', 'data-id': feedId,
+    });
     const fontWeightClass = state.readPostsLinks.includes(link) ? 'fw-normal' : 'fw-bold';
     linkEl.classList.add(fontWeightClass);
     linkEl.textContent = title;
     const buttonEl = document.createElement('button');
-    buttonEl.setAttribute('type', 'button');
-    buttonEl.setAttribute('data-id', '2');
-    buttonEl.setAttribute('data-bs-toggle', 'modal');
-    buttonEl.setAttribute('data-bs-target', '#modal');
+    setAttributes(buttonEl, {
+      type: 'button', 'data-id': '2', 'data-bs-toggle': 'modal', 'data-bs-target': '#modal',
+    });
     buttonEl.classList.add('btn', 'btn-outline-primary', 'btn-sm');
     buttonEl.textContent = i18nextInstance.t('preview');
     listGroupItem.append(linkEl, buttonEl);
