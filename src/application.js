@@ -32,10 +32,11 @@ const getId = () => {
 };
 
 export default () => {
+  const lng = 'ru';
   const i18nextInstance = i18next.createInstance();
   i18nextInstance
     .init({
-      lng: 'ru',
+      lng,
       debug: false,
       resources,
     })
@@ -110,12 +111,10 @@ export default () => {
             const postsWithId = posts.map((post) => ({ ...post, feedId }));
             watchedState.posts = postsWithId.concat(watchedState.posts);
             autoUpdatePosts(feedId);
-            console.log(watchedState);
           })
           .catch((err) => {
             watchedState.process = 'failed';
             watchedState.errors = err.message ?? 'default';
-            console.log(watchedState);
           })
           .finally(() => {
             watchedState.process = 'filling';
